@@ -79,7 +79,7 @@ const movieSchema = new Schema<Document & Movie, Model<Document & Movie>>({
   actionIntensity: {
     type: Number,
     required: [
-      function(this: { genre: Genre }) {
+      function (this: { genre: Genre }) {
         return this.genre === Genre.Action;
       },
       'Action intensity required for action genre'
@@ -586,12 +586,20 @@ const batchSchema = new Schema<{ name: string }>({ name: String }, { discriminat
 batchSchema.discriminator('event', eventSchema);
 
 // discriminator statics
-const eventSchema2 = new Schema({ message: String }, { discriminatorKey: 'kind', statics: { static1: function() {
-  return 0;
-} } });
-const batchSchema2 = new Schema({ name: String }, { discriminatorKey: 'kind', statics: { static2: function() {
-  return 1;
-} } });
+const eventSchema2 = new Schema({ message: String }, {
+  discriminatorKey: 'kind', statics: {
+    static1: function () {
+      return 0;
+    }
+  }
+});
+const batchSchema2 = new Schema({ name: String }, {
+  discriminatorKey: 'kind', statics: {
+    static2: function () {
+      return 1;
+    }
+  }
+});
 batchSchema2.discriminator('event', eventSchema2);
 
 
@@ -897,9 +905,11 @@ function testInferTimestamps() {
     name: String
   }, {
     timestamps: true,
-    methods: { myName(): string | undefined | null {
-      return this.name;
-    } }
+    methods: {
+      myName(): string | undefined | null {
+        return this.name;
+      }
+    }
   });
 
   type WithTimestamps2 = InferSchemaType<typeof schema2>;
@@ -980,7 +990,7 @@ function gh12590() {
   const path = UserSchema.path('hashed_password');
   expectAssignable<SchemaType<any, HydratedDocument<User>>>(path);
 
-  UserSchema.path('hashed_password').validate(function(v) {
+  UserSchema.path('hashed_password').validate(function (v) {
     expectAssignable<HydratedDocument<User>>(this);
     if (this._password && this._password.length < 8) {
       this.invalidate('password', 'Password must be at least 8 characters.');
@@ -1245,18 +1255,18 @@ function gh13514() {
 function gh13633() {
   const schema = new Schema({ name: String });
 
-  schema.pre('updateOne', { document: true, query: false }, function(next) {
+  schema.pre('updateOne', { document: true, query: false }, function (next) {
   });
 
-  schema.pre('updateOne', { document: true, query: false }, function(options) {
+  schema.pre('updateOne', { document: true, query: false }, function (options) {
     expectType<Record<string, any> | undefined>(options);
   });
 
-  schema.post('save', function(res, next) {
+  schema.post('save', function (res, next) {
   });
-  schema.pre('insertMany', function(docs) {
+  schema.pre('insertMany', function (docs) {
   });
-  schema.pre('insertMany', function(docs, options) {
+  schema.pre('insertMany', function (docs, options) {
     expectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
   });
 }
@@ -1314,7 +1324,7 @@ async function gh13797() {
   new Schema<IUser>({
     name: {
       type: String,
-      required: function() {
+      required: function () {
         expectAssignable<HydratedDocument<IUser>>(this);
         return true;
       }
@@ -1323,7 +1333,7 @@ async function gh13797() {
   new Schema<IUser>({
     name: {
       type: String,
-      default: function() {
+      default: function () {
         expectAssignable<HydratedDocument<IUser>>(this);
         return '';
       }
@@ -1873,7 +1883,7 @@ function gh15301() {
     return { hours: parseInt(hours), minutes: parseInt(minutes) };
   };
 
-  userSchema.pre('init', function(rawDoc) {
+  userSchema.pre('init', function (rawDoc) {
     expectType<IUser>(rawDoc);
     if (typeof rawDoc.time === 'string') {
       rawDoc.time = timeStringToObject(rawDoc.time);
@@ -1890,7 +1900,7 @@ function gh15412() {
 
   type ScheduleEntryDoc = ReturnType<typeof ScheduleEntry['hydrate']>
 
-  ScheduleEntrySchema.post('init', function(this: ScheduleEntryDoc, _res: any, next: CallbackWithoutResultAndOptionalError) {
+  ScheduleEntrySchema.post('init', function (this: ScheduleEntryDoc, _res: any, next: CallbackWithoutResultAndOptionalError) {
     expectType<Date>(this.startDate);
     expectType<Date | null | undefined>(this.endDate);
     next();
@@ -1969,7 +1979,7 @@ function gh15516() {
     name: String
   });
 
-  schema.virtual('myVirtual').get(function() {
+  schema.virtual('myVirtual').get(function () {
     expectType<HydratedUserDoc>(this);
   });
 }
@@ -2085,4 +2095,12 @@ function gh15751() {
   const TestModel = model('Test', schema);
   const doc = new TestModel();
   expectType<Types.ObjectId>(doc.myId);
+}
+
+function gh15798() {
+  const schema1 = new Schema({ name: String }, { statics: { testMe() { } }, versionKey: false });
+  model("M1", schema1).testMe();
+
+  const schema2 = new Schema({ name: String }, { statics: { testMe() { } }, timestamps: true });
+  model("M2", schema2).testMe();
 }

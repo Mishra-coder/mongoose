@@ -39,14 +39,14 @@ declare module 'mongoose' {
   > =
     IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType
     : {
-        [K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
-          OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)]: IsPathRequired<
+      [K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
+        OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)]: IsPathRequired<
           DocDefinition[K],
           TSchemaOptions['typeKey']
         > extends true ?
-          ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>
-        : ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
-      };
+      ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>
+      : ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
+    };
 
   /**
    * @summary Obtains document schema type from Schema instance.
@@ -70,17 +70,17 @@ declare module 'mongoose' {
   type ObtainSchemaGeneric<
     TSchema,
     alias extends
-      | 'EnforcedDocType'
-      | 'M'
-      | 'TInstanceMethods'
-      | 'TQueryHelpers'
-      | 'TVirtuals'
-      | 'TStaticMethods'
-      | 'TSchemaOptions'
-      | 'DocType'
-      | 'THydratedDocumentType'
-      | 'TSchemaDefinition'
-      | 'TLeanResultType'
+    | 'EnforcedDocType'
+    | 'M'
+    | 'TInstanceMethods'
+    | 'TQueryHelpers'
+    | 'TVirtuals'
+    | 'TStaticMethods'
+    | 'TSchemaOptions'
+    | 'DocType'
+    | 'THydratedDocumentType'
+    | 'TSchemaDefinition'
+    | 'TLeanResultType'
   > =
     TSchema extends (
       Schema<
@@ -97,24 +97,24 @@ declare module 'mongoose' {
         infer TLeanResultType
       >
     ) ?
-      {
-        EnforcedDocType: EnforcedDocType;
-        M: M;
-        TInstanceMethods: TInstanceMethods;
-        TQueryHelpers: TQueryHelpers;
-        TVirtuals: AddDefaultId<DocType, TVirtuals, TSchemaOptions>;
-        TStaticMethods: TStaticMethods;
-        TSchemaOptions: TSchemaOptions;
-        DocType: DocType;
-        THydratedDocumentType: THydratedDocumentType;
-        TSchemaDefinition: TSchemaDefinition;
-        TLeanResultType: TLeanResultType;
-      }[alias]
+    {
+      EnforcedDocType: EnforcedDocType;
+      M: M;
+      TInstanceMethods: TInstanceMethods;
+      TQueryHelpers: TQueryHelpers;
+      TVirtuals: AddDefaultId<DocType, TVirtuals, TSchemaOptions>;
+      TStaticMethods: TStaticMethods;
+      TSchemaOptions: TSchemaOptions;
+      DocType: DocType;
+      THydratedDocumentType: THydratedDocumentType;
+      TSchemaDefinition: TSchemaDefinition;
+      TLeanResultType: TLeanResultType;
+    }[alias]
     : unknown;
 
   type ResolveSchemaOptions<T> = MergeType<DefaultSchemaOptions, T>;
 
-  type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
+  type ApplySchemaOptions<T, O = DefaultSchemaOptions> = Default__v<ResolveTimestamps<T, O>, O>;
 
   type DefaultTimestampProps = {
     createdAt: NativeDate;
@@ -124,15 +124,15 @@ declare module 'mongoose' {
   type ResolveTimestamps<T, O> =
     O extends { timestamps?: false } ? T
     : O extends { timestamps: infer TimestampOptions } ?
-      TimestampOptions extends true ? T & DefaultTimestampProps
-      : TimestampOptions extends SchemaTimestampsConfig ?
-        Show<
-          T & {
-            [K in keyof TimestampOptions & keyof DefaultTimestampProps as TimestampOptions[K] extends true ? K
-            : TimestampOptions[K] & string]: NativeDate;
-          }
-        >
-      : T
+    TimestampOptions extends true ? T & DefaultTimestampProps
+    : TimestampOptions extends SchemaTimestampsConfig ?
+    Show<
+      T & {
+        [K in keyof TimestampOptions & keyof DefaultTimestampProps as TimestampOptions[K] extends true ? K
+        : TimestampOptions[K] & string]: NativeDate;
+      }
+    >
+    : T
     : T;
 }
 
@@ -143,8 +143,8 @@ type IsPathDefaultUndefined<PathType> =
 
 type RequiredPropertyDefinition =
   | {
-      required: true | string | [true, string | undefined] | { isRequired: true };
-    }
+    required: true | string | [true, string | undefined] | { isRequired: true };
+  }
   | ArrayConstructor
   | any[];
 
@@ -156,17 +156,17 @@ type RequiredPropertyDefinition =
 type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
   P extends RequiredPropertyDefinition ? true
   : P extends { required: boolean } ?
-    P extends { required: false } ?
-      false
-    : true
+  P extends { required: false } ?
+  false
+  : true
   : P extends Record<TypeKey, ArrayConstructor | any[]> ?
-    IsPathDefaultUndefined<P> extends true ?
-      false
-    : true
+  IsPathDefaultUndefined<P> extends true ?
+  false
+  : true
   : P extends Record<TypeKey, any> ?
-    P extends { default: any } ?
-      IfEquals<P['default'], undefined, false, true>
-    : false
+  P extends { default: any } ?
+  IfEquals<P['default'], undefined, false, true>
+  : false
   : false;
 
 /**
@@ -222,14 +222,14 @@ type TypeHint<T> = T extends { __typehint: infer U } ? U : never;
  */
 type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> = ResolvePathType<
   TypeKey extends keyof PathValueType ?
-    TypeKey extends keyof PathValueType[TypeKey] ?
-      PathValueType
-    : PathValueType[TypeKey]
+  TypeKey extends keyof PathValueType[TypeKey] ?
+  PathValueType
+  : PathValueType[TypeKey]
   : PathValueType,
   TypeKey extends keyof PathValueType ?
-    TypeKey extends keyof PathValueType[TypeKey] ?
-      {}
-    : Omit<PathValueType, TypeKey>
+  TypeKey extends keyof PathValueType[TypeKey] ?
+  {}
+  : Omit<PathValueType, TypeKey>
   : {},
   TypeKey,
   TypeHint<PathValueType>
@@ -289,31 +289,31 @@ type ResolvePathType<
   never,
   PathValueType extends Schema ? InferSchemaType<PathValueType>
   : PathValueType extends AnyArray<infer Item> ?
-    IfEquals<Item, never> extends true
-      ? any[]
-      : Item extends Schema ?
-        // If Item is a schema, infer its type.
-        Types.DocumentArray<InferSchemaType<Item>>
-      : Item extends Record<TypeKey, any> ?
-        Item[TypeKey] extends Function | String ?
-          // If Item has a type key that's a string or a callable, it must be a scalar,
-          // so we can directly obtain its path type.
-          ObtainDocumentPathType<Item, TypeKey>[]
-        : // If the type key isn't callable, then this is an array of objects, in which case
-          // we need to call ObtainDocumentType to correctly infer its type.
-          Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>>
-      : IsSchemaTypeFromBuiltinClass<Item> extends true ? ResolvePathType<Item, { enum: Options['enum'] }, TypeKey>[]
-      : IsItRecordAndNotAny<Item> extends true ?
-        Item extends Record<string, never> ?
-          ObtainDocumentPathType<Item, TypeKey>[]
-        : Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>>
-      : ObtainDocumentPathType<Item, TypeKey>[]
+  IfEquals<Item, never> extends true
+  ? any[]
+  : Item extends Schema ?
+  // If Item is a schema, infer its type.
+  Types.DocumentArray<InferSchemaType<Item>>
+  : Item extends Record<TypeKey, any> ?
+  Item[TypeKey] extends Function | String ?
+  // If Item has a type key that's a string or a callable, it must be a scalar,
+  // so we can directly obtain its path type.
+  ObtainDocumentPathType<Item, TypeKey>[]
+  : // If the type key isn't callable, then this is an array of objects, in which case
+  // we need to call ObtainDocumentType to correctly infer its type.
+  Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>>
+  : IsSchemaTypeFromBuiltinClass<Item> extends true ? ResolvePathType<Item, { enum: Options['enum'] }, TypeKey>[]
+  : IsItRecordAndNotAny<Item> extends true ?
+  Item extends Record<string, never> ?
+  ObtainDocumentPathType<Item, TypeKey>[]
+  : Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>>
+  : ObtainDocumentPathType<Item, TypeKey>[]
   : PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']>
   : IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']>
   : PathValueType extends NumberSchemaDefinition ?
-    Options['enum'] extends ReadonlyArray<any> ?
-      Options['enum'][number]
-    : number
+  Options['enum'] extends ReadonlyArray<any> ?
+  Options['enum'][number]
+  : number
   : PathValueType extends DateSchemaDefinition ? NativeDate
   : PathValueType extends UuidSchemaDefinition ? Types.UUID
   : PathValueType extends BufferSchemaDefinition ? Buffer
@@ -324,21 +324,21 @@ type ResolvePathType<
   : PathValueType extends DoubleSchemaDefinition ? Types.Double
   : PathValueType extends MapSchemaDefinition ? Map<string, ObtainDocumentPathType<Options['of']>>
   : PathValueType extends UnionSchemaDefinition ?
-    Options['of'] extends AnyArray<infer U> ? ResolvePathType<U>
-    : never
+  Options['of'] extends AnyArray<infer U> ? ResolvePathType<U>
+  : never
   : PathValueType extends ArrayConstructor ? any[]
   : PathValueType extends typeof Schema.Types.Mixed ? any
   : IfEquals<PathValueType, ObjectConstructor> extends true ? any
   : IfEquals<PathValueType, {}> extends true ? any
   : PathValueType extends typeof SchemaType ? PathValueType['prototype']
   : PathValueType extends Record<string, any> ?
-    ObtainDocumentType<
-      PathValueType,
-      any,
-      {
-        typeKey: TypeKey;
-      }
-    >
+  ObtainDocumentType<
+    PathValueType,
+    any,
+    {
+      typeKey: TypeKey;
+    }
+  >
   : unknown,
   TypeHint
 >;
